@@ -47,7 +47,7 @@ exercised, not what it would do at scale.
 
 ## Name
 
-<img src="docs/middle-path.jpg" alt="Middle Path at dusk, halftone" width="400">
+<img src="docs/middle-path.jpg" alt="Middle Path at dusk, painted" width="400">
 
 Old Kenyon burned in 1949 and was rebuilt the next year from the original
 drawings. Middle Path is the walk that runs past it. Both are on the hill in

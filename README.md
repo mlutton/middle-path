@@ -37,10 +37,13 @@ The thesis, earned rather than claimed:
 ## Where it stands
 
 The decisions are recorded as ADRs and are the first thing worth reading.
-They arrive here through extraction from the private workspace once ruled on;
-until then the proposed set is in review there. The kit itself, about 13,000
-lines of scripts and 22,000 lines of tests, follows in slices, each landing
-with the failing test that motivated it.
+The first two are here: [the factory's objects and
+roles](docs/adr/0001-the-factorys-objects-and-roles.md) and [audience and
+the two doors](docs/adr/0002-audience-and-the-two-doors.md), with the
+[methods](docs/methods.md) alongside. Further decisions arrive the same
+way, by extraction once ruled on. The kit itself, about 13,000 lines of
+scripts and 22,000 lines of tests, follows in slices, each landing with
+the failing test that motivated it.
 
 This is a single-operator factory today. It says what one operator has
 exercised, not what it would do at scale.

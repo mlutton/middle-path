@@ -22,17 +22,20 @@ The thesis, earned rather than claimed:
   A Program Manager translates them and owns everything that leaves. A
   Foreman runs the floor. A Tech Lead per lane designs and slices. Engineers
   build; Testers verify, some of them without the acceptance criteria.
-- **Everything else is a script a model calls once.** Release, close,
-  publish, admit. A script boundary is a transaction boundary; a script
+- **Everything else is a script a model calls once.** In the design,
+  release, close, publish and admit are scripts; today some are and some are
+  still done by hand. A script boundary is a transaction boundary; a script
   either finishes every step and records them or records where it stopped so
   a rerun resumes there.
-- **State is a record, never memory.** Every transition is an event written
-  by the process that observed it. Work orders, rounds, who holds what, and
-  what each round was shown are on disk. Any role can be relaunched from the
-  record alone.
-- **Two doors.** Nothing enters execution without a work order behind it;
-  nothing leaves without passing the one script that holds public
-  credentials. Every artifact carries an audience.
+- **State is a record, never memory.** In the design, every transition is an
+  event written by the process that observed it, and work orders, rounds, who
+  holds what, and what each round was shown are kept in the record, so any
+  role can be relaunched from the record alone. Today part of that record is
+  still kept by hand.
+- **Two doors.** In the design, nothing enters execution without a work
+  order behind it, and nothing leaves without passing the one script that
+  holds public credentials; every artifact carries an audience. Today the
+  Owner posts publicly by hand.
 
 ## Where it stands
 

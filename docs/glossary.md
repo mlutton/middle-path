@@ -47,6 +47,13 @@ An advisory session started by a holder for one question. It holds nothing and
 decides nothing.
 _Avoid_: reviewer
 
+**Judge**:
+A fresh session with no stake in the change that settles one disputed finding,
+at the head it is given. Its ruling is uphold, overrule, conditional or no
+ruling. A ruling settles the disputed triage call and is not an approval; the
+Owner's merge is still the gate.
+_Avoid_: reviewer, arbiter
+
 **Holder**:
 The session, with identity and address, that is responsible for a work order or
 round right now. Recording each change of holder as an event is design; not yet

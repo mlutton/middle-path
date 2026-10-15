@@ -93,6 +93,12 @@ The set of verify rounds at one head. Counting passes keeps "round" for the
 operation itself.
 _Avoid_: round (in the review sense)
 
+**Round cap**:
+The most verify rounds a change may take, counting each re-verify after a fix,
+before the work stops for the Owner's decision. It is set by the change's risk
+tier. It flags weak design and does not stop anyone fixing a finding
+([ADR 0009](adr/0009-the-round-cap-is-a-sensor-for-weak-design.md)).
+
 **Brief**:
 The Engineer's instructions for one round: the deliverable, the inputs, the
 constraints and what counts as done, with the evidence expected for each
@@ -181,6 +187,14 @@ Stop the session holding a work order partway and have a fresh one continue
 from the record alone.
 _Avoid_: failover
 
+**Work record**:
+The part of the operator record that holds one work order, or one backlog item,
+as plain data: a series of complete snapshots, each with who wrote it, why and
+the evidence, the latest being current. Each part of a snapshot has one writer
+([ADR 0006](adr/0006-work-records-are-plain-data-in-snapshots-with-one-writer-per-part.md)).
+The store is built; moving the factory onto it is in progress.
+_Avoid_: status file, ticket
+
 ## The doors
 
 **Audience**:
@@ -226,6 +240,29 @@ stops and asks).
 A document that is read and applied, not a tool to install or invoke.
 [methods](methods.md) says which must be read before which decisions or edits.
 _Avoid_: skill, plugin
+
+## Code and tests
+
+**Component**:
+A folder of code with its own tests and its own way to run them. Other code
+reaches it only through its published interface
+([ADR 0007](adr/0007-a-component-is-a-folder-with-its-own-tests-and-a-published-interface.md)).
+_Avoid_: service
+
+**Published interface**:
+The functions and data a component promises to others, kept in one module.
+Code outside the component does not read anything else of it, including its
+files.
+_Avoid_: API (when the promise is only in-process)
+
+**Boundary test**:
+A test that checks what a component promises to the code around it, including
+that no other code reaches past the published interface.
+
+**Seam**:
+A place where the real thing and a stand-in can swap. Its purpose is to narrow
+what the code under test can reach
+([ADR 0008](adr/0008-a-seam-narrows-what-the-code-under-test-can-reach.md)).
 
 ## Older names
 

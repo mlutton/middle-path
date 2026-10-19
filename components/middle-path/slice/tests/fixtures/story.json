@@ -1,0 +1,7 @@
+{
+  "id": "S-001",
+  "title": "Example change",
+  "why": "Show the path",
+  "acceptance": ["One observable result"],
+  "risk_tier": "medium"
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -u
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 2
+first=0
+for name in ports story packet review merge slice; do
+    "$project_dir/$name/run-suite"
+    rc=$?
+    printf 'SUBSUITE %s rc=%s\n' "$name" "$rc"
+    if [ "$first" -eq 0 ] && [ "$rc" -ne 0 ]; then
+        first=$rc
+    fi
+done
+printf 'middle-path rc=%s\n' "$first"
+exit "$first"

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from mp_examples import PACKET, RAW, STORY, readiness_cases
 from mp_ports import (
+    AgentsRefused,
     BuildResult,
     Decision,
     EffectLog,
@@ -174,12 +175,12 @@ class FailingAgents(MemoryAgents):
     def build(self, packet):
         if self.failure == "build":
             self.log.add("agents", "build", packet)
-            raise RuntimeError("synthetic build failure")
+            raise AgentsRefused()
         return super().build(packet)
 
     def review(self, head, packet):
         self.log.add("agents", "review", head, packet)
-        raise RuntimeError("synthetic review failure")
+        raise AgentsRefused()
 
 
 class RefusingForge(MemoryForge):

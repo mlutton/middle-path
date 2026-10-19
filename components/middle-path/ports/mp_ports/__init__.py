@@ -8,6 +8,7 @@ from .forge import ForgeRefused, MemoryForge
 from .protocols import Agents, Forge, Records
 from .records import MemoryRecords, RecordsRefused
 from .types import (
+    AdapterError,
     BuildResult,
     CloseReason,
     Decision,
@@ -32,7 +33,7 @@ from .types import (
 )
 
 __all__ = [
-    "Agents", "AgentsRefused", "BuildResult", "CloseReason", "Decision", "Effect",
+    "AdapterError", "Agents", "AgentsRefused", "BuildResult", "CloseReason", "Decision", "Effect",
     "EffectLog", "Event", "FailureReason", "Forge", "ForgeRefused", "IssueId", "Layers",
     "MemoryAgents", "MemoryForge", "MemoryRecords", "Packet", "PrId", "Reason", "Records",
     "RecordsRefused", "Refusal", "ReviewResult", "Sha", "Story", "SuiteReport", "Trace",

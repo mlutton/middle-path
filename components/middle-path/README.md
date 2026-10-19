@@ -55,9 +55,19 @@ The returned Trace starts with `story-received` and `packet-ready`. Persisted
 history starts at `record-opened` and carries the story id, canonical packet
 digest, heads, evidence and decision. A successful record closes once with
 reason `done`; refusals and supported failures close once with reason
-`abandoned` and a separate detail. Build, review, verdict-post and merge
-failures have named details. Issue and PR creation failures are a known,
-untested limit of this slice. The decision uses the reviewed head snapshot;
+`abandoned` and a separate detail. Adapters report expected failures through
+the public `AdapterError` base with a stable `reason`; `ForgeRefused`,
+`AgentsRefused` and `RecordsRefused` inherit it and retain their reasons.
+Build and review catch only `AdapterError` and retain `build-failed` and
+`review-failed`. Issue and PR creation failures close with `issue-create-failed`
+and `pr-create-failed`, without further build, review or merge calls. Verdict-post and merge
+refusals retain their named details. A refused close returns a Trace with
+`close-refused` and no `record-closed` step; the adapter's record state remains
+as it left it, and close is never retried. Other exceptions propagate after
+one abandoned close attempt with detail `unexpected-error`.
+Steps present in both histories write the Records event before the Trace note;
+`verdict-recorded` remains Records-only, preserving the successful histories.
+The decision uses the reviewed head snapshot;
 the current head is also observed at decision time and Forge refuses a moved
 head at the conditional merge. Both movement timings are tested. A replay
 uses the story id again and refuses without new Forge or Agents activity.

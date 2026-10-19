@@ -1,10 +1,13 @@
 """Canned agent evidence, keyed by packet id, with complete call arguments."""
 
-from .types import BuildResult, EffectLog, Packet, Sha, Verdict
+from .types import AdapterError, BuildResult, EffectLog, Packet, Sha, Verdict
 
 
-class AgentsRefused(Exception):
+class AgentsRefused(AdapterError):
     reason = "packet-unknown"
+
+    def __init__(self) -> None:
+        super().__init__(self.reason)
 
 
 class MemoryAgents:

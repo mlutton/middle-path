@@ -3,6 +3,7 @@
 from collections.abc import Callable
 
 from mp_ports import (
+    AdapterError,
     Agents,
     BuildResult,
     CloseReason,
@@ -35,7 +36,13 @@ def run(story_raw: object, base_sha: str, *, layers: Layers, records: Records,
     except RecordsRefused as exc:
         return Trace(tuple(steps), Refusal(exc.reason))
     steps.append("record-opened")
-    return session.execute()
+    try:
+        return session.execute()
+    except Exception:
+        # Cleanup must not convert a programming error into an adapter refusal.
+        if not session.close_attempted:
+            session.finish(Refusal("unexpected-error"))
+        raise
 
 
 class _Run:
@@ -49,6 +56,7 @@ class _Run:
         self.clock = clock
         self.steps = steps
         self.version = 0
+        self.close_attempted = False
 
     def event(self, step: str, **payload: str | int | None) -> Event:
         common: dict[str, str | int | None] = {
@@ -59,61 +67,74 @@ class _Run:
     def append(self, step: str, **payload: str | int | None) -> None:
         self.version = self.records.append(self.packet.id, self.event(step, **payload), self.version)
 
+    def step(self, name: str, **payload: str | int | None) -> None:
+        self.append(name, **payload)
+        self.note(name)
+
+    def note(self, name: str) -> None:
+        self.steps.append(name)
+
     def finish(self, outcome: str | Refusal) -> Trace:
         reason: CloseReason = "abandoned" if isinstance(outcome, Refusal) else "done"
         detail = outcome.reason if isinstance(outcome, Refusal) else "MERGE"
-        self.records.close(self.packet.id, reason, detail, self.version)
-        self.steps.append("record-closed")
+        self.close_attempted = True
+        try:
+            self.records.close(self.packet.id, reason, detail, self.version)
+        except RecordsRefused:
+            return Trace(tuple(self.steps), Refusal("close-refused"))
+        self.note("record-closed")
         return Trace(tuple(self.steps), outcome if isinstance(outcome, Refusal) else "MERGE")
 
     def build(self) -> BuildResult | Refusal:
-        self.append("build-requested")
-        self.steps.append("build-requested")
+        self.step("build-requested")
         try:
             result = self.agents.build(self.packet)
-        except Exception:
+        except AdapterError:
             return Refusal("build-failed")
-        self.append("build-returned", build_head=result.head_sha)
-        self.steps.append("build-returned")
+        self.step("build-returned", build_head=result.head_sha)
         return result
 
     def review(self, pr: int, head: str) -> ReviewResult | Refusal:
         try:
             verdict = self.agents.review(head, self.packet)
-        except Exception:
+        except AdapterError:
             return Refusal("review-failed")
         if verdict is not None:
             try:
                 self.forge.post_verdict(pr, verdict)
             except ForgeRefused:
                 return Refusal("verdict-post-refused")
-            self.steps.append("verdict-posted")
+            self.note("verdict-posted")
         self.append("verdict-recorded", verdict_head=verdict.head_sha if verdict else None,
                     kind=verdict.kind if verdict else None)
         return self.layers.review(self.packet, () if verdict is None else (verdict,))
 
     def execute(self) -> Trace:
-        issue = self.forge.create_issue(self.packet.story.title, self.packet.body)
-        self.steps.append("issue-created")
+        try:
+            issue = self.forge.create_issue(self.packet.story.title, self.packet.body)
+        except AdapterError:
+            return self.finish(Refusal("issue-create-failed"))
+        self.note("issue-created")
         result = self.build()
         if isinstance(result, Refusal):
             return self.finish(result)
-        pr = self.forge.create_pr(issue, result.head_sha)
-        self.steps.append("pr-created")
+        try:
+            pr = self.forge.create_pr(issue, result.head_sha)
+        except AdapterError:
+            return self.finish(Refusal("pr-create-failed"))
+        self.note("pr-created")
         head = self.forge.pr_head(pr)
         review = self.review(pr, head)
         if isinstance(review, Refusal):
             return self.finish(review)
         suite = result.suite
-        self.append("suite-recorded", suite_head=suite.head_sha if suite else None,
+        self.step("suite-recorded", suite_head=suite.head_sha if suite else None,
                     suite_exit=suite.exit if suite else None)
-        self.steps.append("suite-recorded")
         observed = self.forge.pr_head(pr)
         # Decide against the reviewed snapshot; Forge atomically refuses any later head.
         decision = self.layers.merge(self.packet, review, suite, head)
-        self.append("merge-decided", head=head, observed_head=observed,
+        self.step("merge-decided", head=head, observed_head=observed,
                     decision=decision.outcome.reason if isinstance(decision.outcome, Refusal) else "MERGE")
-        self.steps.append("merge-decided")
         if isinstance(decision.outcome, Refusal):
             return self.finish(decision.outcome)
         try:

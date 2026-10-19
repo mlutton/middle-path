@@ -1,9 +1,11 @@
 """Versioned in-memory Records adapter. Refusals never change history."""
 
-from .types import CloseReason, EffectLog, Event, RecordReason, Version
+from .types import AdapterError, CloseReason, EffectLog, Event, RecordReason, Version
 
 
-class RecordsRefused(Exception):
+class RecordsRefused(AdapterError):
+    reason: RecordReason
+
     def __init__(self, reason: RecordReason) -> None:
         self.reason = reason
         super().__init__(reason)

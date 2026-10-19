@@ -23,13 +23,26 @@ EvidenceReason: TypeAlias = Literal[
 ]
 RecordReason: TypeAlias = Literal["record-duplicate", "record-unknown", "version-stale", "record-closed"]
 ForgeReason: TypeAlias = Literal["issue-unknown", "pr-unknown", "head-moved", "already-merged", "verdict-refused"]
-FailureReason: TypeAlias = Literal["build-failed", "review-failed", "verdict-post-refused", "merge-refused"]
+FailureReason: TypeAlias = Literal[
+    "build-failed", "review-failed", "verdict-post-refused", "merge-refused",
+    "issue-create-failed", "pr-create-failed", "close-refused", "unexpected-error",
+]
 Reason: TypeAlias = SchemaReason | EvidenceReason | RecordReason | FailureReason
 CloseReason: TypeAlias = Literal["done", "abandoned"]
 Version: TypeAlias = int
 Sha: TypeAlias = str
 IssueId: TypeAlias = int
 PrId: TypeAlias = int
+
+
+class AdapterError(Exception):
+    """Expected failure reported by an adapter, carrying its stable reason."""
+
+    reason: str
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        super().__init__(reason)
 
 
 @dataclass(frozen=True)

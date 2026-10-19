@@ -1,9 +1,11 @@
 """Strict in-memory Forge with an atomic expected-head merge guard."""
 
-from .types import EffectLog, ForgeReason, IssueId, PrId, Sha, Verdict
+from .types import AdapterError, EffectLog, ForgeReason, IssueId, PrId, Sha, Verdict
 
 
-class ForgeRefused(Exception):
+class ForgeRefused(AdapterError):
+    reason: ForgeReason
+
     def __init__(self, reason: ForgeReason) -> None:
         self.reason = reason
         super().__init__(reason)

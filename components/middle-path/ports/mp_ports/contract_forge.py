@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from .forge import ForgeRefused
 from .protocols import Forge
-from .types import Verdict
+from .types import Decision, Role, Verdict
 
 
 def contract_forge_cases() -> tuple[tuple[str, Callable[[Forge, Callable[[], object]], None]], ...]:
@@ -18,7 +18,7 @@ def contract_forge_cases() -> tuple[tuple[str, Callable[[Forge, Callable[[], obj
             "moved-head": ("head-moved", lambda: forge.merge(pr, "old-head")),
             "unknown-issue": ("issue-unknown", lambda: forge.create_pr(999, "head-1")),
             "unknown-head": ("pr-unknown", lambda: forge.pr_head(999)),
-            "unknown-verdict": ("pr-unknown", lambda: forge.post_verdict(999, Verdict("head-1"))),
+            "unknown-verdict": ("pr-unknown", lambda: forge.post_verdict(999, Verdict(Decision.MERGE, "a" * 40, "reviewer-example", Role.PRIMARY))),
             "unknown-merge": ("pr-unknown", lambda: forge.merge(999, "head-1")),
         }
         reason, action = actions[operation]

@@ -11,6 +11,23 @@ a failure, and later runners still run.
 The path is story -> packet -> work record OPENED -> build -> review verdict
 -> merge decision -> work record CLOSED. The four pure layers expose
 `mp_story.load`, `mp_packet.build`, `mp_review.collect` and `mp_merge.decide`.
+`mp_merge.readiness(verdicts, head, rule)` is the pure review requirement decision.
+An approval counts only from a reviewer the caller maps to a required role;
+an objection from any well-formed reviewer is seen and blocks.
+`mp_ports` owns the frozen `Verdict(decision, head, reviewer, role)`, the closed
+`Decision` and `Role` enums, `Rule(required_roles)`, `Ready`, `NotReady`, and
+`parse_head`. A head is exactly 40 lowercase hexadecimal characters;
+`parse_head` returns a `Refusal` for any other input. Readiness examines only
+verdicts at that head. Its closed reasons are `no-verdict-at-head`,
+`stale-only`, `non-merge-at-head`, `duplicate-reviewer`, and
+`missing-role:primary` or `missing-role:second`. A caller supplies role slots;
+the core has no tier table or reviewer registry. The older synthetic merge
+result is named `MergeDecision` to distinguish it from a review decision.
+`Verdict` requires an explicit `Decision`, valid head, nonempty reviewer, and
+`Role`; `Rule` requires a tuple of `Role` values. Construction raises
+`TypeError` or `ValueError` for invalid values. `readiness` raises on an invalid
+head, rule, or verdict collection rather than returning a readiness reason;
+its `NotReady` reasons describe valid review evidence only.
 Only `slice/mp_slice/wiring.py` imports sibling layers and constructs the
 injected `Layers` value. The driver consumes those functions' returned values;
 it does not reconstruct their decisions. `mp_ports.__all__` is the published
@@ -43,8 +60,8 @@ effect exists before readiness passes.
 
 The merge policy is a synthetic single-reviewer policy at medium risk tier. It requires one
 MERGE verdict at the PR head, a suite with exit zero at that same head, a valid
-packet, and no open blocker. Zero verdicts, surplus verdicts in either order,
-AMEND, missing evidence and stale evidence each refuse by name. It is a
+packet, and no BLOCK decision. Zero verdicts, surplus verdicts in either order,
+AMEND, BLOCK, missing evidence and stale evidence each refuse by name. It is a
 deliberately small stand-in: it does not check which model family reviewed,
 whether the reviewer is the author, or how the review was launched. Fixtures
 keep builder and reviewer identities distinct, but nothing enforces it. This
@@ -80,7 +97,8 @@ is one nested package/test/runner unit.
 
 The six architecture entrypoints assert their nonempty source inventories,
 reject sibling and neighbouring-component imports, and guard source and test
-purity. Subprocess is allowed only in the disposable wrapper tests. Port
-contracts have collected `test_contract_*.py` entrypoints; future adapters can
-run the same cases through their own factories. Binding to a real
-record store is not part of this slice.
+purity. Within the six subpackages, subprocess is allowed only in the
+disposable wrapper tests; the root aggregate test runs `run-suite` in a
+subprocess. Port contracts have collected `test_contract_*.py` entrypoints;
+future adapters can run the same cases through their own factories. Binding
+to a real record store is not part of this slice.

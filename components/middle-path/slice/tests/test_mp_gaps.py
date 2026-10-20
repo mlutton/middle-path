@@ -5,6 +5,7 @@ import pytest
 from mp_examples import RAW
 from mp_ports import (
     BuildResult,
+    Decision,
     EffectLog,
     ForgeRefused,
     MemoryAgents,
@@ -12,6 +13,7 @@ from mp_ports import (
     MemoryRecords,
     RecordsRefused,
     Refusal,
+    Role,
     SuiteReport,
     Verdict,
 )
@@ -22,8 +24,8 @@ from mp_slice.wiring import layers
 def state(forge_type=MemoryForge, records_type=MemoryRecords):
     log = EffectLog()
     return (log, records_type(log), forge_type(log),
-            MemoryAgents(log, {"S-001": BuildResult("head-1", SuiteReport("head-1", 0))},
-                         {"S-001": Verdict("head-1")}))
+            MemoryAgents(log, {"S-001": BuildResult("a" * 40, SuiteReport("a" * 40, 0))},
+                         {"S-001": Verdict(Decision.MERGE, "a" * 40, "reviewer-example", Role.PRIMARY)}))
 
 
 def drive(items):
@@ -116,7 +118,7 @@ def test_close_refusal_returns_named_trace(failure, monkeypatch):
         ("abandoned", details[failure]) if failure else ("done", "MERGE"))
     # A write still succeeds: the refused close did not mark the record closed.
     assert items[1].append("S-001", history[-1], len(history)) == len(history) + 1
-    assert items[2].merges == ([] if failure else [(1, "head-1")])
+    assert items[2].merges == ([] if failure else [(1, "a" * 40)])
     print(f"{failure=}: close-refused Trace; opens=1; close attempts=1; record remains writable")
 
 

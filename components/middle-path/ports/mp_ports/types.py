@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 from hashlib import sha256
 from json import dumps
 from re import fullmatch
@@ -27,10 +28,11 @@ FailureReason: TypeAlias = Literal[
     "build-failed", "review-failed", "verdict-post-refused", "merge-refused",
     "issue-create-failed", "pr-create-failed", "close-refused", "unexpected-error",
 ]
-Reason: TypeAlias = SchemaReason | EvidenceReason | RecordReason | FailureReason
+Reason: TypeAlias = SchemaReason | EvidenceReason | RecordReason | FailureReason | Literal["invalid-head"]
 CloseReason: TypeAlias = Literal["done", "abandoned"]
 Version: TypeAlias = int
 Sha: TypeAlias = str
+Head: TypeAlias = str
 IssueId: TypeAlias = int
 PrId: TypeAlias = int
 
@@ -138,12 +140,69 @@ class Packet:
         return self.story.id
 
 
+class Decision(StrEnum):
+    MERGE = "MERGE"
+    AMEND = "AMEND"
+    FIX_FIRST = "FIX_FIRST"
+    BLOCK = "BLOCK"
+
+
+class Role(StrEnum):
+    PRIMARY = "primary"
+    SECOND = "second"
+
+
 @dataclass(frozen=True)
 class Verdict:
-    head_sha: Sha
-    kind: Literal["MERGE", "AMEND"] = "MERGE"
-    open_blocker: bool = False
-    reviewer: str = "reviewer-example"
+    decision: Decision
+    head: Head
+    reviewer: str
+    role: Role
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.decision, Decision):
+            raise TypeError("decision must be a Decision")
+        if isinstance(parse_head(self.head), Refusal):
+            raise ValueError("head must be 40 lowercase hex characters")
+        if not isinstance(self.reviewer, str) or not self.reviewer.strip():
+            raise ValueError("reviewer must be a nonempty string")
+        if not isinstance(self.role, Role):
+            raise TypeError("role must be a Role")
+
+
+def parse_head(text: object) -> Head | Refusal:
+    if not isinstance(text, str) or fullmatch(r"[0-9a-f]{40}", text) is None:
+        return Refusal("invalid-head")
+    return text
+
+
+@dataclass(frozen=True)
+class Rule:
+    required_roles: tuple[Role, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.required_roles, tuple) or any(
+            not isinstance(role, Role) for role in self.required_roles
+        ):
+            raise TypeError("required_roles must be a tuple of Role values")
+        if not self.required_roles:
+            raise ValueError("required_roles must contain at least one role")
+
+
+@dataclass(frozen=True)
+class Ready:
+    pass
+
+
+ReadinessReason: TypeAlias = Literal[
+    "no-verdict-at-head", "non-merge-at-head", "missing-role:primary",
+    "missing-role:second", "duplicate-reviewer", "stale-only",
+]
+
+
+@dataclass(frozen=True)
+class NotReady:
+    reasons: tuple[ReadinessReason, ...]
 
 
 @dataclass(frozen=True)
@@ -166,7 +225,7 @@ class BuildResult:
 
 
 @dataclass(frozen=True)
-class Decision:
+class MergeDecision:
     outcome: Literal["MERGE"] | Refusal
 
 
@@ -197,7 +256,7 @@ class Layers:
     story: Callable[[object], Story | Refusal]
     packet: Callable[[Story, Sha], Packet | Refusal]
     review: Callable[[Packet, tuple[Verdict, ...]], ReviewResult]
-    merge: Callable[[Packet | Refusal, ReviewResult, SuiteReport | None, Sha], Decision]
+    merge: Callable[[Packet | Refusal, ReviewResult, SuiteReport | None, Sha], MergeDecision]
 
 
 @dataclass(frozen=True)

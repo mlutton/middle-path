@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Published ports are the only shared package for a standalone layer.
+# Wiring additionally needs the four layer roots.
+PYTHONPATH="$project_dir:$project_dir/../ports:$project_dir/../story:$project_dir/../packet:$project_dir/../review:$project_dir/../merge" exec python3 -m pytest "$project_dir/tests" -q -p no:cacheprovider

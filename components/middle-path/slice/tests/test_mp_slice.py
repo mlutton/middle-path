@@ -10,6 +10,7 @@ from mp_ports import (
     AgentsRefused,
     BuildResult,
     Decision,
+    MergeDecision,
     EffectLog,
     ForgeRefused,
     MemoryAgents,
@@ -17,15 +18,16 @@ from mp_ports import (
     MemoryRecords,
     Refusal,
     ReviewResult,
+    Role,
     SuiteReport,
     Verdict,
 )
 from mp_slice import run
 from mp_slice.wiring import layers
 
-H1 = "head-1"
-H2 = "head-2"
-GREEN_VERDICT = Verdict(H1)
+H1 = "a" * 40
+H2 = "b" * 40
+GREEN_VERDICT = Verdict(Decision.MERGE, H1, "reviewer-example", Role.PRIMARY)
 GREEN_SUITE = SuiteReport(H1, 0)
 TRACE = ("story-received", "packet-ready", "record-opened", "issue-created",
          "build-requested", "build-returned", "pr-created", "verdict-posted",
@@ -85,14 +87,14 @@ def test_happy_path():
     ]
     assert forge.issues == {1: (STORY.title, PACKET.body)}
     assert forge.prs == {1: (1, H1)}
-    assert forge.verdicts == [(1, Verdict(H1))]
+    assert forge.verdicts == [(1, GREEN_VERDICT)]
     assert forge.merges == [(1, H1)]
     assert calls(log, "agents", "build") == [(PACKET,)]
     assert calls(log, "agents", "review") == [(H1, PACKET)]
     assert len(calls(log, "records", "close")) == 1
     operations = [(e.port, e.operation) for e in log.entries]
     assert operations.index(("forge", "post_verdict")) < operations.index(("forge", "merge"))
-    assert BuildResult(H1, None).builder != Verdict(H1).reviewer
+    assert BuildResult(H1, None).builder != GREEN_VERDICT.reviewer
     other = setup()
     drive(other, base="base-9")
     assert calls(other[0], "agents", "build") == [(replace(PACKET, base_sha="base-9"),)]
@@ -116,14 +118,14 @@ def test_layer_output_used(layer):
         varied = replace(PACKET, story=replace(STORY, title="Varied packet"), base_sha="varied")
         composition = replace(composition, packet=lambda story, base: varied)
     elif layer == "review":
-        varied = ReviewResult((Verdict(H1, "AMEND"),))
+        varied = ReviewResult((Verdict(Decision.AMEND, H1, "reviewer-example", Role.PRIMARY),))
         original = composition.merge
         def merge(packet, review, suite, head):
             seen.append(review)
             return original(packet, review, suite, head)
         composition = replace(composition, review=lambda packet, verdicts: varied, merge=merge)
     else:
-        varied = Decision(Refusal("open-blocker"))
+        varied = MergeDecision(Refusal("open-blocker"))
         composition = replace(composition, merge=lambda *args: varied)
     trace = drive(state, composition=composition)
     if layer in ("story", "review"):
@@ -154,8 +156,9 @@ def test_readiness_no_effects(raw, reason):
 ])
 def test_slice_refusals(reason):
     verdict = None if reason == "verdict-missing" else Verdict(
-        H2 if reason == "stale-head" else H1,
-        "AMEND" if reason == "verdict-not-merge" else "MERGE", reason == "open-blocker")
+        Decision.BLOCK if reason == "open-blocker" else
+        Decision.AMEND if reason == "verdict-not-merge" else Decision.MERGE,
+        H2 if reason == "stale-head" else H1, "reviewer-example", Role.PRIMARY)
     suite = None if reason == "suite-missing" else SuiteReport(
         H2 if reason == "suite-stale-head" else H1, 7 if reason == "suite-not-green" else 0)
     composition = layers()

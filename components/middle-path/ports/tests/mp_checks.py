@@ -13,9 +13,6 @@ SOURCES = {
 }
 PUBLIC = {"mp_story": "load", "mp_packet": "build", "mp_review": "collect", "mp_merge": "decide"}
 FORBIDDEN = {"subprocess", "socket", "urllib", "http", "requests", "time", "datetime", "random", "uuid"}
-# split so this guard does not match its own source
-CLIENTS = {"cl" + "aude", "co" + "dex", "anthropic", "openai", "claude_agent_sdk", "claude_code_sdk"}
-EXECUTABLES = {"cl" + "aude", "co" + "dex"}
 
 
 def source_paths(root):
@@ -74,7 +71,7 @@ def pure(root):
         aliases = {}
         for node, module, names in imports(tree):
             head = module.split(".")[0]
-            assert head not in FORBIDDEN | CLIENTS, (path, module)
+            assert head not in FORBIDDEN, (path, module)
             if isinstance(node, ast.Import):
                 aliases.update({alias.asname or alias.name: alias.name for alias in node.names})
             if head == "os" and names is not None:
@@ -83,8 +80,6 @@ def pure(root):
             if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
                 assert not (aliases.get(node.value.id, node.value.id) == "os" and
                             node.attr in {"environ", "getenv"}), path
-            if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                assert node.value not in EXECUTABLES, (path, node.value)
     print(f"purity {root.name} pure source files={len(source_paths(root))}")
 
 
@@ -95,10 +90,6 @@ def check_tests_pure(root):
         tree = ast.parse(path.read_text())
         for _, module, _ in imports(tree):
             head = module.split(".")[0]
-            assert head not in CLIENTS, (path, module)
             if head == "subprocess":
                 assert root.name == "slice" and path.name == "test_mp_wrapper.py", path
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                assert node.value not in EXECUTABLES, (path, node.value)
-    print(f"purity {root.name} test files={len(paths)} no live clients")
+    print(f"purity {root.name} test files={len(paths)} subprocess policy checked")

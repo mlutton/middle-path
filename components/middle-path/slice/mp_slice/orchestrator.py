@@ -105,8 +105,8 @@ class _Run:
             except ForgeRefused:
                 return Refusal("verdict-post-refused")
             self.note("verdict-posted")
-        self.append("verdict-recorded", verdict_head=verdict.head_sha if verdict else None,
-                    kind=verdict.kind if verdict else None)
+        self.append("verdict-recorded", verdict_head=verdict.head if verdict else None,
+                    kind=verdict.decision.value if verdict else None)
         return self.layers.review(self.packet, () if verdict is None else (verdict,))
 
     def execute(self) -> Trace:

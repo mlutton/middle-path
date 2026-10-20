@@ -2,12 +2,12 @@
 
 import pytest
 from mp_examples import PACKET
-from mp_ports import Refusal, Verdict
+from mp_ports import Decision, Refusal, Role, Verdict
 from mp_review import collect
 
-MERGE = Verdict("head-1")
-AMEND = Verdict("head-1", "AMEND")
-BLOCK = Verdict("head-1", open_blocker=True)
+MERGE = Verdict(Decision.MERGE, "a" * 40, "reviewer-example", Role.PRIMARY)
+AMEND = Verdict(Decision.AMEND, "a" * 40, "reviewer-example", Role.PRIMARY)
+BLOCK = Verdict(Decision.BLOCK, "a" * 40, "reviewer-example", Role.PRIMARY)
 SURPLUS = [(a, b) for a, b in ((MERGE, MERGE), (MERGE, AMEND), (MERGE, BLOCK),
                               (AMEND, MERGE), (BLOCK, MERGE))]
 

@@ -12,6 +12,13 @@ from .types import (
     BuildResult,
     CloseReason,
     Decision,
+    Head,
+    MergeDecision,
+    NotReady,
+    ReadinessReason,
+    Ready,
+    Role,
+    Rule,
     Effect,
     EffectLog,
     Event,
@@ -29,6 +36,7 @@ from .types import (
     Trace,
     Verdict,
     Version,
+    parse_head,
     validate_story,
 )
 
@@ -37,6 +45,7 @@ __all__ = [
     "EffectLog", "Event", "FailureReason", "Forge", "ForgeRefused", "IssueId", "Layers",
     "MemoryAgents", "MemoryForge", "MemoryRecords", "Packet", "PrId", "Reason", "Records",
     "RecordsRefused", "Refusal", "ReviewResult", "Sha", "Story", "SuiteReport", "Trace",
-    "Verdict", "Version", "validate_story", "contract_agents_cases", "contract_forge_cases",
+    "Verdict", "Version", "Head", "MergeDecision", "NotReady", "ReadinessReason", "Ready", "Role", "Rule",
+    "parse_head", "validate_story", "contract_agents_cases", "contract_forge_cases",
     "contract_records_cases",
 ]

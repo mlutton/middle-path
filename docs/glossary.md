@@ -139,7 +139,8 @@ a Tester's verdict.
 
 **Merge-ready**:
 Reported only when the pull request head is the commit that was reviewed, the
-full test suite passed, and no blocker is open.
+full test suite passed, and no blocker is open. The planned R1.3 gate will
+combine a pure review decision with test and mergeability evidence.
 
 **Accepted**:
 A work order the Owner has accepted. In the flows on these pages that is when

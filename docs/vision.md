@@ -5,8 +5,8 @@ software that meet four bars:
 
 - **Product.** It does what the work request asked, judged the way the person
   who asked would judge it.
-- **Engineering.** It is built to the repository's standards and reviewed,
-  normally by at least one model from a vendor other than the author's.
+- **Engineering.** It is built to the repository's standards and reviewed.
+  Every change is reviewed by a model other than its author; security-boundary and other high-risk changes need two vendors; a review never passes for lack of capacity: the work waits. That rule holds today.
 - **Operational.** It runs where it lands, can be recovered, and does not break
   what is already live.
 - **Testing.** Its behavior is pinned by tests, and the evidence that it passes
@@ -40,22 +40,22 @@ holds today or is part of the design.
   never edited, and a correction is a new event that points at what it corrects.
   Boards and status pages are meant to be views computed from the events; today
   some are still kept by hand, and replacing them is part of the work.
-- **Refusals will be recorded too.** When a check refuses something, that
-  refusal becomes an event. A run of refusals followed by a pass on the same
+- **Refusals will be recorded too.** In the design, when a check refuses
+  something, that refusal becomes an event. A run of refusals followed by a pass on the same
   work is something a person should look at, and the record will make it
   visible.
 - **Two doors.** In the design, nothing enters execution without a work order
   behind it, and nothing leaves except through the one script that holds public
   credentials ([ADR 0002](adr/0002-audience-and-the-two-doors.md)). Every
   artifact will carry an audience. Today a person posts publicly by hand.
-- **Everything a step needs comes in with the work.** A step works from what its
-  work order and brief give it. If something is missing, it stops and asks
-  instead of guessing. In the design, the question and the answer are recorded
-  on the work order.
+- **Everything a step needs comes in with the work.** In the design, a step works from
+  what its work order and brief give it. If something is missing, it stops and
+  asks instead of guessing, and the question and the answer are recorded on the
+  work order. Today tickets stand in for work orders.
 
 ## The operator record
 
-The operator record (the published ADRs call it the internal record) is where
+The operator record (some of the published ADRs call it the internal record) is where
 the factory keeps what happened: its work, the steps taken on it, who held it,
 what each step was given, what it returned, and how it ended. It is private to
 the installation that runs the factory. Parts of it are still kept as files and
@@ -83,22 +83,17 @@ notes by hand; the design makes all of it events.
 
 The factory assumes that the work orders reaching it carry entry data that
 something else has already made safe. No such gate is part of the factory today.
-Mitigations for untrusted input, such as text from the open web, are being
-prototyped outside the factory; the current focus is building the factory
-itself. This is a stated assumption, not a solved guarantee.
+Mitigations for untrusted input, such as text from the open web, are not part
+of the factory yet; the current focus is building the factory itself. This is a stated assumption, not a solved guarantee.
 
 ## Where it stands
 
-This is a single-operator factory today. The first two decisions, [ADR 0001](adr/0001-the-factorys-objects-and-roles.md)
-and [ADR 0002](adr/0002-audience-and-the-two-doors.md), are published, and more
-will follow. The code arrives in pieces, each with a clear contract and tests.
+This is a single-operator factory today. Nine decisions are published as
+[ADRs](adr/), and more will follow. A walking skeleton is published; the rest of the code
+will arrive in pieces, each with a clear contract and tests.
 
 ## Coming next
 
-**Setting up the operator record.** A first script that creates a new record
-(the layout and the format version) or checks an existing one before the
-factory uses it, refusing with a named reason if the existing record's format is
-one the factory cannot read. If the record has a git remote that looks public,
-the script warns, and the factory will not push the record to it.
-
-Each update to this page names the next piece.
+The next piece is setting up the operator record: a script that creates a new
+record or checks an existing one before the factory uses it. No date is
+promised.

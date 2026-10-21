@@ -23,7 +23,7 @@ because of what it said earlier.
 | 3. Build | An Engineer works in an isolated worktree, on one piece. | A diff on a branch |
 | 4. Handback | The Engineer returns evidence, not "done": the test runs, the diff, the commands it ran. | An evidence file |
 | 5. Re-run | The Tech Lead re-runs the Engineer's claims. This is the lead's own check, not a Tester verdict. | A log of the re-run |
-| 6. Cross-vendor review | Testers review the change, normally one from each vendor. Each writes a verdict, merge or amend, that names the exact commit it read. A Tester who focuses on security joins on sensitive changes. | A verdict on a commit |
+| 6. Independent review | Testers review the change. Every change is reviewed by a model other than its author; security-boundary and other high-risk changes need two vendors; a review never passes for lack of capacity: the work waits. Each writes a verdict, merge or amend, that names the exact commit it read. A Tester who focuses on security joins on sensitive changes. | A verdict on a commit |
 | 7. Merge-ready gate | The change is reported merge-ready only if the pull request head is the commit that was reviewed (or that commit merged with main, with no conflict in reviewed code and the full test suite re-run on the result), the full test suite passed, and no blocker is open. | A merge-ready report |
 | 8. Merge | The Owner merges. | The merge commit |
 | 9. Install | A change to a live system ships as an Owner card: a staged script with a confirm step, an undo, and pins to the reviewed version. The card is itself reviewed. The Owner runs it. | An install log and the pins |
@@ -47,14 +47,12 @@ and the order is on purpose.
    pass. The local model is used only for narrow yes/no questions, and only
    as advice: for example, does a code comment say what the code does.
    Nothing here spends vendor quota.
-2. **The cross-vendor loop is paid for in subscription quota, and it gates
-   the merge.** It normally has one Tester per vendor, each giving a verdict
-   on the exact commit. Its purpose is to catch what the author's own model
-   misses: logic and safety defects, and regressions between fix rounds.
-   With two vendors, a change is normally read by at least one model from a
-   vendor other than the author's. That does not mean no model reviews its
-   own vendor's work: one of the two Testers often shares the author's
-   vendor. When quota is short, a review can run with a single vendor.
+2. **The independent review loop is paid for in subscription quota, and it
+   gates the merge.** Every change is reviewed by a model other than its author; security-boundary and other high-risk changes need two vendors; a review never passes for lack of capacity: the work waits. Each review
+   gives a verdict on the exact commit. Its purpose is to catch what the author's
+   own model misses: logic and safety defects, and regressions between fix
+   rounds. Where two Testers read a change, one of them often shares the
+   author's vendor.
 3. **The exploratory loop teaches and never gates.** These are lab runs
    that ask questions such as which jobs a local model can do, or whether a
    cheaper model can take a role. The pass or kill rule is written down

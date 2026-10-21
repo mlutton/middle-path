@@ -10,7 +10,7 @@ A step is crossed only when the file behind it exists. An Engineer's handback na
 
 A Tester verifies in a separate session from the Engineer's, and reports one verdict per head: merge or amend. The verdict is bound to the exact head it read, so a later change needs a new verdict.
 
-Review is normally by one reviewer from each of two vendors, so a blind spot in one family of models is less likely to pass both. When that is not possible, the review runs on one vendor and the record says so. A change at a security boundary gets a threat review as well, which looks for bypasses and false passes only. A change that can alter state outside the repository gets an adversarial arm, which is given no criteria (ADR 0005). Authority documents get a documentation review. A pull request is never reported ready on a partial set of verdicts, and a finding never passes for lack of reviewer capacity: with no headroom, it stays open.
+Every change is reviewed by a model other than its author; security-boundary and other high-risk changes need two vendors; a review never passes for lack of capacity: the work waits. Two vendors make it less likely that a blind spot in one family of models passes both. A change at a security boundary gets a threat review as well, which looks for bypasses and false passes only. A change that can alter state outside the repository gets an adversarial arm, which is given no criteria (ADR 0005). Authority documents get a documentation review. A pull request is never reported ready on a partial set of verdicts, and a finding never passes for lack of reviewer capacity: with no headroom, it stays open.
 
 ## Tests
 
@@ -32,7 +32,7 @@ Code-quality findings (weak tests, unclear code) are always fixed, whatever thei
 
 A blocking finding names a concrete failure: what breaks, for whom, and under what input. A finding without one is a question, and a question gets answered before the pull request is reported ready.
 
-From the third review pass on a change at a security boundary, a finding blocks only if it is a correctness or safety failure with a scenario from ordinary use, and it has been reproduced. The exception is a finding that defeats the boundary's own purpose, such as a private value in the output of a redaction change, an action that gets past a check to do what it should refuse, or a leaked secret. Those still block, crafted input included, and only a fresh Tester, a judge or the Owner can downgrade one.
+After repeated review passes on a change at a security boundary, a finding blocks only if it is a correctness or safety failure with a scenario from ordinary use, and it has been reproduced. The exception is a finding that defeats the boundary's own purpose, such as a private value in the output of a redaction change, an action that gets past a check to do what it should refuse, or a leaked secret. Those still block, crafted input included, and only a fresh Tester, a judge or the Owner can downgrade one.
 
 ## What verification does not do
 

@@ -109,6 +109,6 @@ The request and answer as recorded events on the work order are design.
 from a ticket to the record. These pictures cover the same path in the
 design's words: its ticket becomes the work order, its build and fix steps are
 rounds, its re-run is the Tech Lead's own check before the verify rounds, not a
-round, its cross-vendor review is the verify rounds and their verdicts, and its
+round, its independent review is the verify rounds and their verdicts, and its
 record is the event log of picture 3. Where the lifecycle page says a step "is
 planned, not built", the pictures mark the same step as design.

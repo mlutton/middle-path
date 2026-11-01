@@ -94,6 +94,4 @@ will arrive in pieces, each with a clear contract and tests.
 
 ## Coming next
 
-The next piece is setting up the operator record: a script that creates a new
-record or checks an existing one before the factory uses it. No date is
-promised.
+[What's next](whats-next.md) lists the stages that come next. No date is promised.

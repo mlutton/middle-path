@@ -89,9 +89,9 @@ to earn it, on real work:
 
 ## What is not here yet
 
-Release R1.2 introduced typed review verdicts and a pure readiness decision.
-R1.3 is planned to make that decision authoritative, backed by tests for every
-listed class of input.
+The v0.1.2-merge-gate tag added typed review verdicts and a pure readiness decision.
+[What's next](docs/whats-next.md) lists later steps, and
+[the verdict format](docs/verdict-format.md) describes typed review evidence.
 
 - **Most of the code.** The skeleton is the first slice. The rest of the working
   code lives in a private workspace today and will arrive here one slice at a

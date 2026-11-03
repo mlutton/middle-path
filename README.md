@@ -72,6 +72,7 @@ The decisions are recorded as ADRs and are the first thing worth reading:
 - [0007, components and their published interfaces](docs/adr/0007-a-component-is-a-folder-with-its-own-tests-and-a-published-interface.md)
 - [0008, seams that narrow what a test reaches](docs/adr/0008-a-seam-narrows-what-the-code-under-test-can-reach.md)
 - [0009, the round cap as a sensor for weak design](docs/adr/0009-the-round-cap-is-a-sensor-for-weak-design.md)
+- [0010, how a component is classified](docs/adr/0010-a-component-is-a-subcomponent-a-sibling-repository-or-private-by-stated-tests.md)
 
 More decisions will be added as they are ruled on.
 

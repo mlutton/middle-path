@@ -1,8 +1,8 @@
 """The component target runs its independently runnable subpackages."""
 
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 
 def test_middle_path_component_suite():

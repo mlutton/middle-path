@@ -153,11 +153,36 @@ class Role(StrEnum):
 
 
 @dataclass(frozen=True)
+class ExtraRoles:
+    state: Literal["resolved", "invalid"]
+    roles: tuple[Role, ...] = ()
+    rule_version: int | None = None
+
+    def __post_init__(self) -> None:
+        if self.state not in ("resolved", "invalid"):
+            raise ValueError("state must be resolved or invalid")
+        if not isinstance(self.roles, tuple) or any(not isinstance(role, Role) for role in self.roles):
+            raise TypeError("roles must be a tuple of Role values")
+        if len(set(self.roles)) != len(self.roles):
+            raise ValueError("roles must be unique")
+        if self.state == "invalid" and self.roles:
+            raise ValueError("invalid evidence cannot carry roles")
+        if self.rule_version is not None and type(self.rule_version) is not int:
+            raise TypeError("rule_version must be an integer")
+
+    @classmethod
+    def none(cls) -> ExtraRoles:
+        return cls("resolved")
+
+
+@dataclass(frozen=True)
 class Verdict:
     decision: Decision
     head: Head
     reviewer: str
     role: Role
+    provenance: Literal["direct", "carried"] = "direct"
+    carried_from: Head | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.decision, Decision):
@@ -168,6 +193,15 @@ class Verdict:
             raise ValueError("reviewer must be a nonempty string")
         if not isinstance(self.role, Role):
             raise TypeError("role must be a Role")
+        if self.provenance not in ("direct", "carried"):
+            raise ValueError("provenance must be direct or carried")
+        if self.provenance == "direct" and self.carried_from is not None:
+            raise ValueError("direct verdict cannot have carried_from")
+        if self.provenance == "carried" and (
+            self.role != Role.SECOND or self.decision != Decision.MERGE or
+            isinstance(parse_head(self.carried_from), Refusal) or self.carried_from == self.head
+        ):
+            raise ValueError("invalid carried verdict")
 
 
 def parse_head(text: object) -> Head | Refusal:
@@ -197,6 +231,7 @@ class Ready:
 ReadinessReason: TypeAlias = Literal[
     "no-verdict-at-head", "non-merge-at-head", "missing-role:primary",
     "missing-role:second", "duplicate-reviewer", "stale-only",
+    "extra-roles-invalid",
 ]
 
 

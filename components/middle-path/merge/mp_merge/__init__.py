@@ -1,12 +1,67 @@
 """Pure merge evidence boundary."""
 
 from collections import Counter
+from dataclasses import dataclass
 
-from mp_ports import (Decision, Head, MergeDecision, NotReady, Packet, Ready, Refusal,
-                      ReviewResult, Role, Rule, Sha, SuiteReport, Verdict, parse_head)
+from mp_ports import (
+    Decision,
+    ExtraRoles,
+    Head,
+    MergeDecision,
+    NotReady,
+    Packet,
+    ReadinessReason,
+    Ready,
+    Refusal,
+    ReviewResult,
+    Role,
+    Rule,
+    Sha,
+    SuiteReport,
+    Verdict,
+    parse_head,
+)
 
 
-def readiness(verdicts: tuple[Verdict, ...], head: Head, rule: Rule) -> Ready | NotReady:
+@dataclass(frozen=True)
+class MergeFacts:
+    head: Head
+    parents: tuple[Head, ...]
+    main_parent_in_main: bool
+    merge_tree_ok: bool
+    tree_equal: bool
+    pr_files: tuple[str, ...]
+    main_files: tuple[str, ...]
+    security_path: bool
+    resolution_lines: int
+    unavailable: str | None
+
+
+@dataclass(frozen=True)
+class Carry:
+    carried: bool
+    reason: str
+
+
+def carry(old_head: Head, new_head: Head, facts: MergeFacts) -> Carry:
+    """Decide whether a second-role verdict can cross this exact main merge."""
+    if facts.unavailable:
+        return Carry(False, f"carry-unavailable: {facts.unavailable}")
+    if facts.head != new_head or len(facts.parents) != 2 or facts.parents[0] != old_head or not facts.main_parent_in_main:
+        return Carry(False, "not-main-merge-head")
+    if facts.security_path:
+        return Carry(False, "security-path")
+    if set(facts.pr_files) & set(facts.main_files):
+        return Carry(False, "overlap")
+    if not facts.merge_tree_ok:
+        return Carry(False, "merge-tree-conflict")
+    if not facts.tree_equal:
+        return Carry(False, "tree-differs")
+    return Carry(True, "carried")
+
+
+def readiness(verdicts: tuple[Verdict, ...], head: Head, rule: Rule,
+              *, extra: ExtraRoles = ExtraRoles.none()) -> Ready | NotReady:  # noqa: B008 - immutable value
     """An approval counts only from a reviewer the caller maps to a required role;
     an objection from any well-formed reviewer is seen and blocks."""
     if isinstance(parse_head(head), Refusal):
@@ -17,6 +72,10 @@ def readiness(verdicts: tuple[Verdict, ...], head: Head, rule: Rule) -> Ready | 
         raise TypeError("rule must contain Role values")
     if not isinstance(verdicts, tuple) or any(not isinstance(verdict, Verdict) for verdict in verdicts):
         raise TypeError("verdicts must be a tuple of Verdict values")
+    if not isinstance(extra, ExtraRoles):
+        raise TypeError("extra must be ExtraRoles")
+    if extra.state == "invalid":
+        return NotReady(("extra-roles-invalid",))
     current = tuple(verdict for verdict in verdicts if verdict.head == head)
     if not current:
         return NotReady(("stale-only" if verdicts else "no-verdict-at-head",))
@@ -26,10 +85,12 @@ def readiness(verdicts: tuple[Verdict, ...], head: Head, rule: Rule) -> Ready | 
     if any(verdict.decision != Decision.MERGE for verdict in current):
         return NotReady(("non-merge-at-head",))
     available = Counter(verdict.role for verdict in current)
-    required = Counter(rule.required_roles)
-    missing = tuple("missing-role:primary" if role.value == "primary" else "missing-role:second"
-                    for role in required
-                    if available[role] < required[role])
+    required = Counter(rule.required_roles) | Counter(extra.roles)
+    missing: tuple[ReadinessReason, ...] = tuple(
+        "missing-role:primary" if role.value == "primary" else "missing-role:second"
+        for role in required
+        if available[role] < required[role]
+    )
     return NotReady(missing) if missing else Ready()
 
 

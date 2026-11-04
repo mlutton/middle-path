@@ -8,9 +8,9 @@ them.
 
 This page names the stages that come next. It gives no dates, and a stage may change or move as the work teaches us something.
 
-## Extra roles in the review decision
+## Now in the package: extra roles in the review decision
 
-The review decision will take a typed, optional input that can only raise the required roles. Verdicts will carry where they came from.
+The review decision takes an optional `ExtraRoles` input that can only raise the required roles. Verdicts carry their provenance: direct, or carried from a different head. `carry()` is a pure decision about whether a second-role verdict can cross a merge of main, based on facts supplied by the caller.
 
 ## The review rules in public
 

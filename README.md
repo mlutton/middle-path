@@ -56,6 +56,7 @@ the design and check it against the evidence:
   [lifecycle](docs/lifecycle.md) of a piece of work, the
   [flows](docs/flows.md), [how verification works](docs/verification.md) and the
   [methods](docs/methods.md).
+- Read [how the private factory uses Middle Path](docs/private-factory.md).
 - Read the case study (below), where the same ideas are tried on real work and
   the numbers are published.
 
@@ -73,6 +74,7 @@ The decisions are recorded as ADRs and are the first thing worth reading:
 - [0008, seams that narrow what a test reaches](docs/adr/0008-a-seam-narrows-what-the-code-under-test-can-reach.md)
 - [0009, the round cap as a sensor for weak design](docs/adr/0009-the-round-cap-is-a-sensor-for-weak-design.md)
 - [0010, how a component is classified](docs/adr/0010-a-component-is-a-subcomponent-a-sibling-repository-or-private-by-stated-tests.md)
+- [0011, a branch is the deploy source](docs/adr/0011-a-branch-is-the-deploy-source.md)
 
 More decisions will be added as they are ruled on.
 

@@ -4,7 +4,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 from mp_merge import readiness
-from mp_ports import Decision, NotReady, Ready, Role, Rule, Verdict, parse_head
+from mp_ports import Decision, ExtraRoles, NotReady, Ready, Role, Rule, Verdict, parse_head
 
 H = "a" * 40
 OLD = "b" * 40
@@ -17,6 +17,33 @@ def verdict(decision=Decision.MERGE, head=H, reviewer="r-primary", role=Role.PRI
 
 def test_current_merge_is_ready():
     assert readiness((verdict(),), parse_head(H), RULE) == Ready()
+
+
+def test_extra_roles_raise_the_requirement_without_lowering_baseline():
+    assert readiness((verdict(),), H, RULE,
+                     extra=ExtraRoles("resolved", (Role.SECOND,))) == NotReady(("missing-role:second",))
+    heavy = Rule((Role.PRIMARY, Role.SECOND))
+    assert readiness((verdict(),), H, heavy,
+                     extra=ExtraRoles("resolved", (Role.PRIMARY,))) == NotReady(("missing-role:second",))
+    assert readiness((verdict(),), H, Rule((Role.PRIMARY, Role.PRIMARY)),
+                     extra=ExtraRoles("resolved", (Role.PRIMARY,))) == NotReady(("missing-role:primary",))
+    assert readiness((verdict(),), H, RULE, extra=ExtraRoles.none()) == Ready()
+
+
+def test_invalid_extra_roles_refuse_even_complete_verdicts():
+    assert readiness((verdict(),), H, RULE,
+                     extra=ExtraRoles("invalid")) == NotReady(("extra-roles-invalid",))
+    for roles in (("second",), (Role.SECOND, Role.SECOND)):
+        with pytest.raises((TypeError, ValueError)):
+            ExtraRoles("resolved", roles)
+    with pytest.raises(ValueError):
+        ExtraRoles("invalid", (Role.SECOND,))
+    with pytest.raises(ValueError):
+        ExtraRoles("unknown")
+    with pytest.raises(TypeError):
+        ExtraRoles("resolved", rule_version=True)
+    with pytest.raises(TypeError):
+        readiness((verdict(),), H, RULE, extra=None)
 
 
 def test_verdict_is_frozen():

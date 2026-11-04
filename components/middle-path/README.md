@@ -11,22 +11,25 @@ a failure, and later runners still run.
 The path is story -> packet -> work record OPENED -> build -> review verdict
 -> merge decision -> work record CLOSED. The four pure layers expose
 `mp_story.load`, `mp_packet.build`, `mp_review.collect` and `mp_merge.decide`.
-`mp_merge.readiness(verdicts, head, rule)` is the pure review requirement decision.
+`mp_merge.readiness(verdicts, head, rule, *, extra=ExtraRoles.none())` is the pure review requirement decision.
+`ExtraRoles` can raise required role counts but cannot remove baseline roles.
 An approval counts only from a reviewer the caller maps to a required role;
 an objection from any well-formed reviewer is seen and blocks.
 `mp_ports` owns the frozen `Verdict(decision, head, reviewer, role)`, the closed
-`Decision` and `Role` enums, `Rule(required_roles)`, `Ready`, `NotReady`, and
+`Decision` and `Role` enums, `Rule(required_roles)`, `ExtraRoles`, `Ready`, `NotReady`, and
 `parse_head`. A head is exactly 40 lowercase hexadecimal characters;
 `parse_head` returns a `Refusal` for any other input. Readiness examines only
 verdicts at that head. Its closed reasons are `no-verdict-at-head`,
 `stale-only`, `non-merge-at-head`, `duplicate-reviewer`, and
-`missing-role:primary` or `missing-role:second`. A caller supplies role slots;
+`missing-role:primary`, `missing-role:second`, or `extra-roles-invalid`.
+Invalid extra evidence returns `extra-roles-invalid` before examining verdicts.
+A caller supplies role slots;
 the core has no tier table or reviewer registry. The older synthetic merge
 result is named `MergeDecision` to distinguish it from a review decision.
 `Verdict` requires an explicit `Decision`, valid head, nonempty reviewer, and
 `Role`; `Rule` requires a tuple of `Role` values. Construction raises
 `TypeError` or `ValueError` for invalid values. `readiness` raises on an invalid
-head, rule, or verdict collection rather than returning a readiness reason;
+head, rule, extra type, or verdict collection rather than returning a readiness reason;
 its `NotReady` reasons describe valid review evidence only.
 Only `slice/mp_slice/wiring.py` imports sibling layers and constructs the
 injected `Layers` value. The driver consumes those functions' returned values;

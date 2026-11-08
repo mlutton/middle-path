@@ -3,12 +3,12 @@
 The v0.1.0-skeleton tag is a [walking skeleton](../components/middle-path/README.md):
 one runnable slice through story, packet, review and merge, with GitHub and the
 agents faked. The v0.1.2-merge-gate tag added a typed review verdict and a pure
-readiness decision to it; [the verdict format](verdict-format.md) describes
-them.
+readiness decision to the package; [the verdict format](verdict-format.md)
+describes them. The v0.1.3-extra-roles tag added optional extra roles to that decision, verdict provenance, and a pure carry decision. The slice does not call `readiness` or `carry`: it still merges through `decide`.
 
 This page names the stages that come next. It gives no dates, and a stage may change or move as the work teaches us something.
 
-## Now in the package: extra roles in the review decision
+## In the package since v0.1.3-extra-roles: extra roles in the review decision
 
 The review decision takes an optional `ExtraRoles` input that can only raise the required roles. Verdicts carry their provenance: direct, or carried from a different head. `carry()` is a pure decision about whether a second-role verdict can cross a merge of main, based on facts supplied by the caller.
 

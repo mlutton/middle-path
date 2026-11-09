@@ -10,7 +10,7 @@ A Tech Lead takes one work order at a time and drives it through design, slices,
 
 **What it owns.** The outcome: the work delivered properly, efficiently and with little risk. It balances speed against quality and is expected to push back on a finding that slows the work without lowering real risk. Speed never costs the tests, the fail-loud rule or the standing rules. The balance is in scope and polish.
 
-**What it decides without asking.** Readiness, slicing, dispatch, which worker to use, how a review is set up, fix rounds, and whether a defect needs filing. It does not wait for the Program Manager to move forward. What the lane works on next, contracts and scope, the exact wording of public posts and the Owner's list below are the Owner's.
+**What it decides without asking.** Readiness, slicing, dispatch, which worker to use, how a review is set up, fix rounds, and whether a defect needs filing. It does not wait for the Program Manager to move forward. What the lane works on next, contracts and scope, approval of the wording of public posts (the Program Manager drafts it) and the Owner's list below are the Owner's.
 
 **How it works a round.**
 
@@ -88,7 +88,7 @@ The Owner holds everything read-only and decides what only the Owner can. The fa
 - anything that introduces metered or billed usage;
 - answering an approval prompt in any agent session.
 
-Everything else is delegated: floor decisions to the Foreman, lane decisions to the Tech Leads, outward wording to the Program Manager, each with a log the Owner can audit.
+Everything else is delegated: floor decisions to the Foreman, lane decisions to the Tech Leads, outward wording to the Program Manager, who drafts it for the Owner's approval, each with a log the Owner can audit.
 
 **Merging.** The lead prepares a card by hand for each pull request. The Owner merges what has been presented as merge-ready, with the head, the review set the risk class requires and the suite result. "Ready with lead overrides" means a reviewer's amend still stands and the Tech Lead pushed back or deferred it, or a judge ruled for the Tech Lead. The card lists each override and its reason, and those are the calls to read before merging. The Owner checks the base branch on the merge button, since fix and chained pull requests merge into a feature branch. Chains merge in order.
 

@@ -10,11 +10,11 @@ This page names the stages that come next. It gives no dates, and a stage may ch
 
 ## In the package since v0.1.3-extra-roles: extra roles in the review decision
 
-The review decision takes an optional `ExtraRoles` input that can only raise the required roles. Verdicts carry their provenance: direct, or carried from a different head. `carry()` is a pure decision about whether a second-role verdict can cross a merge of main, based on facts supplied by the caller.
+The review decision takes an optional `ExtraRoles` input that can only raise the required roles. Verdicts carry their provenance: direct, or carried from a different head. `carry()` is a pure decision about whether a second-role verdict could cross a merge of main, based on facts supplied by the caller; it builds no verdict. The review rule is unchanged: one verdict per head.
 
 ## The review rules in public
 
-The rules for how a change is reviewed and tested, along with the Tester's runbook and templates, will move into this repository. The factory will then use these copies.
+The Tester's rules and a verdict template now live in this repository (docs/tester.md and docs/templates/verdict.md); the Tester's runbook and the remaining templates will follow. The factory will then use these copies.
 
 ## An operator record
 

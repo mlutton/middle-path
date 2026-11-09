@@ -14,8 +14,8 @@ _Avoid_: user, admin
 
 **Program Manager**:
 The role that faces the outside: translates a work request into factory terms,
-and owns the audience of every artifact and the wording of everything that
-leaves.
+and owns the audience of every artifact; drafts the wording of everything that
+leaves, which the Owner approves.
 _Avoid_: product owner, editor
 
 **Foreman**:

@@ -2,6 +2,10 @@
 
 Entries name what changed in this repository and nothing else.
 
+## v0.1.4-review-rules, 2026-11-09
+
+- Tester rules and a verdict template are added; the roles and glossary pages say the Program Manager drafts the wording of what leaves, which the Owner approves; the verdict-format page adds the six-field verdict, an extra-roles section and the extra-roles-invalid reason; the what's-next page says the review rule is still one verdict per head.
+
 ## v0.1.1-docs, 2026-10-21
 
 A documentation tag, published after the walking skeleton and after

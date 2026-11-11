@@ -14,7 +14,7 @@ The review decision takes an optional `ExtraRoles` input that can only raise the
 
 ## The review rules in public
 
-The Tester's rules and a verdict template now live in this repository (docs/tester.md and docs/templates/verdict.md); the Tester's runbook and the remaining templates will follow. The factory will then use these copies.
+The Tester's rules, a verdict template and the Tester's runbook now live in this repository (docs/tester.md, docs/templates/verdict.md and docs/tester-runbook.md).
 
 ## An operator record
 

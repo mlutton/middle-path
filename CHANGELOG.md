@@ -2,6 +2,10 @@
 
 Entries name what changed in this repository and nothing else.
 
+## v0.1.5-factory-picture, 2026-11-11
+
+- A page drawing the roles and the way work moves, and the Tester's runbook, are added; the what's-next page says the Tester's rules, the verdict template and the runbook are in this repository.
+
 ## v0.1.4-review-rules, 2026-11-09
 
 - Tester rules and a verdict template are added; the roles and glossary pages say the Program Manager drafts the wording of what leaves, which the Owner approves; the verdict-format page adds the six-field verdict, an extra-roles section and the extra-roles-invalid reason; the what's-next page says the review rule is still one verdict per head.

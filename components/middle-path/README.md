@@ -37,6 +37,16 @@ it does not reconstruct their decisions. `mp_ports.__all__` is the published
 seam for frozen values, three protocols, in-memory adapters and reusable
 contract cases. The tests guard both production and test imports.
 
+## See it run
+
+`components/middle-path/slice/tests/test_example.py` is one readable test file that exercises the walking skeleton: a story goes in, the layers run in order, and a merge decision comes out. It wires the layers and ports by hand, using only the names the package publishes, and each test states its scenario in its docstring.
+
+Run it from the repository root (it needs pytest):
+
+    python3 -m pytest components/middle-path/slice/tests/test_example.py -q -p no:cacheprovider
+
+It uses in-memory stand-ins for the work record, the code host and the build and review agents: there is no GitHub, no live model and no network. It shows one merged run and the refusals of a bad story or base commit, and nothing else. Reviewer identity and roles are supplied by the caller; a checked registry is a later stage.
+
 Each standalone runner sets its own package root and the ports root on
 `PYTHONPATH`. Slice additionally needs the story, packet, review and merge
 roots for wiring; its conftest makes those same four roots visible. Test-only

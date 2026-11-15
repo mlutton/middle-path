@@ -2,6 +2,10 @@
 
 Entries name what changed in this repository and nothing else.
 
+## v0.1.6-example-test, 2026-11-15
+
+- An end-to-end example test is added to the slice, and the README points to it.
+
 ## v0.1.5-factory-picture, 2026-11-11
 
 - A page drawing the roles and the way work moves, and the Tester's runbook, are added; the what's-next page says the Tester's rules, the verdict template and the runbook are in this repository.

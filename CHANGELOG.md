@@ -2,6 +2,10 @@
 
 Entries name what changed in this repository and nothing else.
 
+## v0.1.6.1-whats-next, 2026-11-15
+
+- The what's-next page places the coming stages the vision page covers in its picture and adds a table of what the slice uses today, and the README now says the example test builds the ports by hand and takes the layers from the package's own wiring function.
+
 ## v0.1.6-example-test, 2026-11-15
 
 - An end-to-end example test is added to the slice, and the README points to it.

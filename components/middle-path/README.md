@@ -39,7 +39,7 @@ contract cases. The tests guard both production and test imports.
 
 ## See it run
 
-`components/middle-path/slice/tests/test_example.py` is one readable test file that exercises the walking skeleton: a story goes in, the layers run in order, and a merge decision comes out. It wires the layers and ports by hand, using only the names the package publishes, and each test states its scenario in its docstring.
+`components/middle-path/slice/tests/test_example.py` is one readable test file that exercises the walking skeleton: a story goes in, the layers run in order, and a merge decision comes out. It builds the in-memory ports by hand and takes the layers from the package's own wiring function, and each test states its scenario in its docstring.
 
 Run it from the repository root (it needs pytest):
 
